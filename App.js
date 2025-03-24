@@ -1,9 +1,11 @@
 import React, { useState } from "react";
-import { ScrollView, Text, View } from "react-native";
+import { ScrollView, View } from "react-native";
 import { SafeAreaProvider, SafeAreaView } from "react-native-safe-area-context";
 import { s } from "./App.style";
 import Header from "./components/Header/Header";
 import CardTodo from "./components/CardTodo/CardTodo";
+import TabBottomMenu from "./components/TabBottomMenu/TabBottomMenu";
+import { TabStatus } from "./utils/utils";
 
 const App = () => {
   const [todoList, setTodoList] = useState([
@@ -11,6 +13,7 @@ const App = () => {
     { id: 2, title: "Go to the dentist", isCompleted: false },
     { id: 3, title: "Learn React Native", isCompleted: false },
   ]);
+  const [selectedTabName, setSelectedTabName] = useState(TabStatus.all);
 
   function renderTodoList() {
     return todoList.map((todo) => (
@@ -57,7 +60,7 @@ const App = () => {
         </SafeAreaView>
       </SafeAreaProvider>
       <View style={s.footer}>
-        <Text>Footer</Text>
+        <TabBottomMenu selectedTabName={selectedTabName} onPress={setSelectedTabName} />
       </View>
     </>
   );
