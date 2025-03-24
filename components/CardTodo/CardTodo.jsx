@@ -3,9 +3,9 @@ import { s } from "./CardTodo.sytle";
 import { Image, Text, TouchableOpacity } from "react-native";
 import checkMark from "../../assets/check.png";
 
-const CardTodo = ({ todo }) => {
+const CardTodo = ({ todo, onPress }) => {
   return (
-    <TouchableOpacity style={s.card}>
+    <TouchableOpacity style={s.card} onPress={() => onPress(todo)}>
       <Text style={[s.title, todo.isCompleted && { textDecorationLine: "line-through" }]}>
         {todo.title}
       </Text>
