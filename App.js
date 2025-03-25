@@ -6,6 +6,9 @@ import Header from "./components/Header/Header";
 import CardTodo from "./components/CardTodo/CardTodo";
 import TabBottomMenu from "./components/TabBottomMenu/TabBottomMenu";
 import { TabStatus } from "./utils/utils";
+import ButtonAdd from "./components/ButtonAdd/ButtonAdd";
+import Dialog from "react-native-dialog";
+import uuid from "react-native-uuid";
 
 const App = () => {
   const [todoList, setTodoList] = useState([
@@ -14,6 +17,8 @@ const App = () => {
     { id: 3, title: "Learn React Native", isCompleted: false },
   ]);
   const [selectedTabName, setSelectedTabName] = useState(TabStatus.all);
+  const [isDialogVisible, setIsDialogVisible] = useState(false);
+  const [inputValue, setInputValue] = useState("");
 
   function getFilteredList() {
     switch (selectedTabName) {
@@ -35,7 +40,6 @@ const App = () => {
           text: "Delete",
           sytle: "destructive",
           onPress: () => {
-            console.log("Delete this todo ", todo);
             setTodoList(todoList.filter((t) => t.id !== todo.id));
           }
         },
@@ -74,6 +78,33 @@ const App = () => {
     });
   }
 
+  function addTodo() {
+    const newTodo = {
+      id: uuid.v4(),
+      title: inputValue,
+      isCompleted: false
+    }
+
+    setTodoList([...todoList, newTodo]);
+    setIsDialogVisible(false);
+    setInputValue("");
+  }
+
+  function renderAddDialog() {
+    return (
+      <Dialog.Container
+        visible={isDialogVisible}
+        onBackdropPress={() => setIsDialogVisible(false)}
+      >
+        <Dialog.Title>Add todo</Dialog.Title>
+        <Dialog.Description>Choose a name for your todo</Dialog.Description>
+        <Dialog.Input placeholder="Ex: Go to the dentist" onChangeText={setInputValue} />
+        <Dialog.Button label="Cancel" color="grey" onPress={() => setIsDialogVisible(false)} />
+        <Dialog.Button label="Save" onPress={addTodo} disabled={inputValue.length === 0} />
+      </Dialog.Container>
+    );
+  }
+
   return (
     <>
       <SafeAreaProvider>
@@ -86,6 +117,7 @@ const App = () => {
               {renderTodoList()}
             </ScrollView>
           </View>
+          <ButtonAdd onPress={() => setIsDialogVisible(true)} />
         </SafeAreaView>
       </SafeAreaProvider>
       <View style={s.footer}>
@@ -95,6 +127,7 @@ const App = () => {
           onPress={setSelectedTabName}
         />
       </View>
+      {renderAddDialog()}
     </>
   );
 };
