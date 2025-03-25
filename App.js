@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { Alert, ScrollView, View } from "react-native";
 import { SafeAreaProvider, SafeAreaView } from "react-native-safe-area-context";
 import { s } from "./App.style";
@@ -19,6 +19,7 @@ const App = () => {
   const [selectedTabName, setSelectedTabName] = useState(TabStatus.all);
   const [isDialogVisible, setIsDialogVisible] = useState(false);
   const [inputValue, setInputValue] = useState("");
+  const scrollViewRef = useRef();
 
   useEffect(() => {
     loadTodoList();
@@ -104,6 +105,9 @@ const App = () => {
     setTodoList([...todoList, newTodo]);
     setIsDialogVisible(false);
     setInputValue("");
+    setTimeout(() => {
+      scrollViewRef.current.scrollToEnd();
+    }, 300);
   }
 
   function renderAddDialog() {
@@ -149,7 +153,7 @@ const App = () => {
             <Header />
           </View>
           <View style={s.body}>
-            <ScrollView>
+            <ScrollView ref={scrollViewRef}>
               {renderTodoList()}
             </ScrollView>
           </View>
