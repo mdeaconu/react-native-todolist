@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Alert, ScrollView, View } from "react-native";
 import { SafeAreaProvider, SafeAreaView } from "react-native-safe-area-context";
 import { s } from "./App.style";
@@ -9,16 +9,32 @@ import { TabStatus } from "./utils/utils";
 import ButtonAdd from "./components/ButtonAdd/ButtonAdd";
 import Dialog from "react-native-dialog";
 import uuid from "react-native-uuid";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+
+let isFirstRender = true;
+let isLoadUpdate = false;
 
 const App = () => {
-  const [todoList, setTodoList] = useState([
-    { id: 1, title: "Walk the dog", isCompleted: true },
-    { id: 2, title: "Go to the dentist", isCompleted: false },
-    { id: 3, title: "Learn React Native", isCompleted: false },
-  ]);
+  const [todoList, setTodoList] = useState([]);
   const [selectedTabName, setSelectedTabName] = useState(TabStatus.all);
   const [isDialogVisible, setIsDialogVisible] = useState(false);
   const [inputValue, setInputValue] = useState("");
+
+  useEffect(() => {
+    loadTodoList();
+  }, []);
+
+  useEffect(() => {
+    if (isLoadUpdate) {
+      isLoadUpdate = false;
+    } else {
+      if (isFirstRender) {
+        isFirstRender = false;
+      } else {
+        saveTodoList();
+      }
+    }
+  }, [todoList]);
 
   function getFilteredList() {
     switch (selectedTabName) {
@@ -103,6 +119,26 @@ const App = () => {
         <Dialog.Button label="Save" onPress={addTodo} disabled={inputValue.length === 0} />
       </Dialog.Container>
     );
+  }
+
+  async function loadTodoList() {
+    try {
+      const todoListString = await AsyncStorage.getItem("@todoList");
+      const decodedList = JSON.parse(todoListString);
+      isLoadUpdate = true;
+      setTodoList(decodedList ?? []);
+    } catch (error) {
+      alert(error);
+      setTodoList([]);
+    }
+  }
+
+  async function saveTodoList() {
+    try {
+      await AsyncStorage.setItem("@todoList", JSON.stringify(todoList));
+    } catch (error) {
+      alert(error);
+    }
   }
 
   return (
